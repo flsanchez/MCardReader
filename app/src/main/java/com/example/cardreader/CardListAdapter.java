@@ -2,6 +2,7 @@ package com.example.cardreader;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
-
-import java.util.ArrayList;
 
 import static
         androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY;
@@ -95,11 +97,22 @@ abstract class AbstractCardViewHolder extends RecyclerView.ViewHolder{
 
     public void onClickShowImage(View v) {
         String cardURL = getCardList().get(mPosition).getCardImageURL();
+        int screen_orientation = v.getResources().getConfiguration().orientation;
 
-        Context context = v.getContext();
-        Intent intent = new Intent(context, CardDetailActivity.class);
-        intent.putExtra(CardDetailActivity.KEY_CARD_URL, cardURL);
-        context.startActivity(intent);
+        if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Context context = v.getContext();
+            Intent intent = new Intent(context, CardDetailActivity.class);
+            intent.putExtra(CardDetailActivity.KEY_CARD_URL, cardURL);
+            context.startActivity(intent);
+        } else {
+            FragmentManager fragmentManager =
+                    ((AppCompatActivity)v.getContext()).getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            CardDetailFragment cardDetailFragment = CardDetailFragment.newInstance(cardURL);
+            fragmentTransaction.replace(
+                    R.id.card_detail_land_fragment_container, cardDetailFragment);
+            fragmentTransaction.commit();
+        }
     }
 
     abstract CardList getCardList();

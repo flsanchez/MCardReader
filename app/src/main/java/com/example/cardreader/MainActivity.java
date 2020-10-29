@@ -5,6 +5,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
 
@@ -26,6 +27,14 @@ public class MainActivity extends AppCompatActivity {
 
         CardListFragment cardListFragment = CardListFragment.newInstance(cardList);
         fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
+
+        int screen_orientation = getResources().getConfiguration().orientation;
+        if (screen_orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            CardDetailFragment cardDetailFragment =
+                    CardDetailFragment.newInstance(cardList.get(0).getCardImageURL());
+            fragmentTransaction.add(R.id.card_detail_land_fragment_container, cardDetailFragment);
+        }
+
         fragmentTransaction.commit();
 
         FloatingActionButton fab = findViewById(R.id.fab_favorites);
