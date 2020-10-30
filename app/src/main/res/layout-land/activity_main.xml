@@ -41,7 +41,6 @@
         android:clickable="true"
         android:focusable="true"
         android:src="@android:drawable/btn_star"
-        app:backgroundTint="@color/purple_200"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

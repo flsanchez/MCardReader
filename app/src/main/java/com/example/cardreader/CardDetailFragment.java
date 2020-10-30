@@ -45,8 +45,6 @@ public class CardDetailFragment extends Fragment {
         ImageView mImageView = view.findViewById(R.id.card_image);
         Picasso.get()
                 .load(cardUrl)
-                .fit()
-                .centerInside()
                 .into(mImageView);
 
         return view;
