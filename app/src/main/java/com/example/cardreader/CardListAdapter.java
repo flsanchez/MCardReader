@@ -22,10 +22,12 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     private final LayoutInflater mInflater;
     private final CardList cardList;
     public StateRestorationPolicy stateRestorationPolicy = PREVENT_WHEN_EMPTY;
+    private Boolean showFavorite;
 
-    public CardListAdapter(Context context, CardList cardList) {
+    public CardListAdapter(Context context, CardList cardList, Boolean showFavorite) {
         mInflater = LayoutInflater.from(context);
         this.cardList = cardList;
+        this.showFavorite = showFavorite;
     }
 
     class CardViewHolder extends AbstractCardViewHolder{
@@ -36,7 +38,11 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
             super(itemView);
             this.mAdapter = adapter;
             favoriteButton = itemView.findViewById(R.id.favorite_button);
-            favoriteButton.setOnClickListener(this::onClickFavorite);
+            if (showFavorite) {
+                favoriteButton.setOnClickListener(this::onClickFavorite);
+            } else {
+                favoriteButton.setVisibility(View.GONE);
+            }
         }
 
         @Override

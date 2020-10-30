@@ -13,6 +13,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+    private Boolean showFavorite = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        CardListFragment cardListFragment = CardListFragment.newInstance(cardList);
+        CardListFragment cardListFragment = CardListFragment.newInstance(cardList, showFavorite);
         fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
 
         int screen_orientation = getResources().getConfiguration().orientation;
@@ -41,10 +42,15 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent favoriteIntent = new Intent(
-                        MainActivity.this, FavoriteActivity.class);
-                favoriteIntent.putExtra(FavoriteActivity.EXTRA_CARD_LIST, cardList.getFavorites());
-                startActivity(favoriteIntent);
+                showFavorite = !showFavorite;
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                CardListFragment cardListFragment =
+                        CardListFragment.newInstance(
+                                showFavorite ? cardList : cardList.getFavorites(), showFavorite);
+                fragmentTransaction.replace(R.id.fragment_recycler_container, cardListFragment);
+                fragmentTransaction.commit();
             }
         });
     }

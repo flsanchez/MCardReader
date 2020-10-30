@@ -20,15 +20,18 @@ import java.util.ArrayList;
 public class CardListFragment extends Fragment {
 
     private static final String CARDLIST_PARAM = "CARDLIST_PARAM";
+    private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
     private CardListAdapter mCardListAdapter;
     private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private CardList cardList = new CardList();
+    private Boolean showFavorite;
 
-    public static CardListFragment newInstance(CardList cardList) {
+    public static CardListFragment newInstance(CardList cardList, Boolean showFavorite) {
         CardListFragment fragment = new CardListFragment();
         Bundle args = new Bundle();
         args.putSerializable(CARDLIST_PARAM, cardList);
+        args.putBoolean(FAVORITE_PARAM, showFavorite);
         fragment.setArguments(args);
         return fragment;
     }
@@ -39,6 +42,7 @@ public class CardListFragment extends Fragment {
         if (getArguments() != null) {
             cardList =
                     new CardList((ArrayList<Card>) getArguments().getSerializable(CARDLIST_PARAM));
+            showFavorite = getArguments().getBoolean(FAVORITE_PARAM);
         }
     }
 
@@ -48,7 +52,7 @@ public class CardListFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_card_list, container, false);
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        mCardListAdapter = new CardListAdapter(view.getContext(), cardList);
+        mCardListAdapter = new CardListAdapter(view.getContext(), cardList, showFavorite);
         mRecyclerView.setAdapter(mCardListAdapter);
         mLayoutManager = new LinearLayoutManager(view.getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
