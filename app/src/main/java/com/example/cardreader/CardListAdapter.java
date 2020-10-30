@@ -22,7 +22,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     private final LayoutInflater mInflater;
     private final CardList cardList;
     public StateRestorationPolicy stateRestorationPolicy = PREVENT_WHEN_EMPTY;
-    private Boolean showFavorite;
+    private final Boolean showFavorite;
 
     public CardListAdapter(Context context, CardList cardList, Boolean showFavorite) {
         mInflater = LayoutInflater.from(context);
@@ -30,14 +30,22 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
         this.showFavorite = showFavorite;
     }
 
-    class CardViewHolder extends AbstractCardViewHolder{
+    class CardViewHolder extends RecyclerView.ViewHolder{
+        public final TextView textName;
+        public final TextView textText;
+        public int mPosition;
+        public final ImageView imageShow;
         public final ImageView favoriteButton;
         final CardListAdapter mAdapter;
 
         public CardViewHolder(@NonNull View itemView, CardListAdapter adapter) {
             super(itemView);
+            textName = itemView.findViewById(R.id.name);
+            textText = itemView.findViewById(R.id.text);
+            imageShow = itemView.findViewById(R.id.image_button);
             this.mAdapter = adapter;
             favoriteButton = itemView.findViewById(R.id.favorite_button);
+            imageShow.setOnClickListener(this::onClickShowImage);
             if (showFavorite) {
                 favoriteButton.setOnClickListener(this::onClickFavorite);
             } else {
@@ -45,15 +53,30 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
             }
         }
 
-        @Override
-        CardList getCardList() {
-            return cardList;
-        }
-
         private void onClickFavorite(View v) {
-            Card card = getCardList().get(mPosition);
+            Card card = cardList.get(mPosition);
             card.setFavourite(!card.getFavourite());
             mAdapter.notifyItemChanged(mPosition);
+        }
+
+        public void onClickShowImage(View v) {
+            String cardURL = cardList.get(mPosition).getCardImageURL();
+            int screen_orientation = v.getResources().getConfiguration().orientation;
+
+            if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
+                Context context = v.getContext();
+                Intent intent = new Intent(context, CardDetailActivity.class);
+                intent.putExtra(CardDetailActivity.KEY_CARD_URL, cardURL);
+                context.startActivity(intent);
+            } else {
+                FragmentManager fragmentManager =
+                        ((AppCompatActivity)v.getContext()).getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                CardDetailFragment cardDetailFragment = CardDetailFragment.newInstance(cardURL);
+                fragmentTransaction.replace(
+                        R.id.card_detail_land_fragment_container, cardDetailFragment);
+                fragmentTransaction.commit();
+            }
         }
 
     }
@@ -65,7 +88,6 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
         View mItemView = mInflater.inflate(R.layout.recycler_item, parent, false);
         return new CardViewHolder(mItemView, this);
     }
-
 
     @Override
     public void onBindViewHolder(@NonNull CardListAdapter.CardViewHolder holder, int position) {
@@ -82,44 +104,4 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     public int getItemCount() {
         return cardList.size();
     }
-}
-
-
-abstract class AbstractCardViewHolder extends RecyclerView.ViewHolder{
-    public final TextView textName;
-    public final TextView textText;
-    public int mPosition;
-    public final ImageView imageShow;
-    public final ImageView favoriteButton;
-
-    public AbstractCardViewHolder(@NonNull View itemView) {
-        super(itemView);
-        textName = itemView.findViewById(R.id.name);
-        textText = itemView.findViewById(R.id.text);
-        imageShow = itemView.findViewById(R.id.image_button);
-        favoriteButton = itemView.findViewById(R.id.favorite_button);
-        imageShow.setOnClickListener(this::onClickShowImage);
-    }
-
-    public void onClickShowImage(View v) {
-        String cardURL = getCardList().get(mPosition).getCardImageURL();
-        int screen_orientation = v.getResources().getConfiguration().orientation;
-
-        if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Context context = v.getContext();
-            Intent intent = new Intent(context, CardDetailActivity.class);
-            intent.putExtra(CardDetailActivity.KEY_CARD_URL, cardURL);
-            context.startActivity(intent);
-        } else {
-            FragmentManager fragmentManager =
-                    ((AppCompatActivity)v.getContext()).getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            CardDetailFragment cardDetailFragment = CardDetailFragment.newInstance(cardURL);
-            fragmentTransaction.replace(
-                    R.id.card_detail_land_fragment_container, cardDetailFragment);
-            fragmentTransaction.commit();
-        }
-    }
-
-    abstract CardList getCardList();
 }
