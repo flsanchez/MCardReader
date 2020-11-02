@@ -1,8 +1,14 @@
 package com.example.cardreader;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,7 +23,7 @@ import java.util.ArrayList;
  * Use the {@link CardListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CardListFragment extends Fragment {
+public class CardListFragment extends Fragment implements CardImageDisplayer {
 
     private static final String CARDLIST_PARAM = "CARDLIST_PARAM";
     private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
@@ -52,11 +58,29 @@ public class CardListFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_card_list, container, false);
         mRecyclerView = view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
-        mCardListAdapter = new CardListAdapter(view.getContext(), cardList, showFavorite);
+        mCardListAdapter = new CardListAdapter(
+                view.getContext(), cardList, showFavorite,this);
         mRecyclerView.setAdapter(mCardListAdapter);
         mLayoutManager = new LinearLayoutManager(view.getContext());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         return view;
+    }
+
+    @Override
+    public void displayCardImage(Context context, String cardUrl, int screen_orientation) {
+        if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Intent intent = new Intent(context, CardDetailActivity.class);
+            intent.putExtra(CardDetailActivity.KEY_CARD_URL, cardUrl);
+            context.startActivity(intent);
+        } else {
+            FragmentManager fragmentManager =
+                    ((AppCompatActivity)context).getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            CardDetailFragment cardDetailFragment = CardDetailFragment.newInstance(cardUrl);
+            fragmentTransaction.replace(
+                    R.id.card_detail_land_fragment_container, cardDetailFragment);
+            fragmentTransaction.commit();
+        }
     }
 }

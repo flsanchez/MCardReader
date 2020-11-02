@@ -1,8 +1,6 @@
 package com.example.cardreader;
 
 import android.content.Context;
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,9 +8,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static
@@ -23,11 +18,14 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     private final CardList cardList;
     public StateRestorationPolicy stateRestorationPolicy = PREVENT_WHEN_EMPTY;
     private final Boolean showFavorite;
+    private final CardImageDisplayer cardImageDisplayer;
 
-    public CardListAdapter(Context context, CardList cardList, Boolean showFavorite) {
+    public CardListAdapter(Context context, CardList cardList, Boolean showFavorite,
+                           CardImageDisplayer cardImageDisplayer) {
         mInflater = LayoutInflater.from(context);
         this.cardList = cardList;
         this.showFavorite = showFavorite;
+        this.cardImageDisplayer = cardImageDisplayer;
     }
 
     class CardViewHolder extends RecyclerView.ViewHolder{
@@ -37,6 +35,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
         public final ImageView imageShow;
         public final ImageView favoriteButton;
         final CardListAdapter mAdapter;
+        final CardImageDisplayer cardImageDisplayer;
 
         public CardViewHolder(@NonNull View itemView, CardListAdapter adapter) {
             super(itemView);
@@ -44,6 +43,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
             textText = itemView.findViewById(R.id.text);
             imageShow = itemView.findViewById(R.id.image_button);
             this.mAdapter = adapter;
+            this.cardImageDisplayer = adapter.cardImageDisplayer;
             favoriteButton = itemView.findViewById(R.id.favorite_button);
             imageShow.setOnClickListener(this::onClickShowImage);
             if (showFavorite) {
@@ -62,21 +62,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
         public void onClickShowImage(View v) {
             String cardURL = cardList.get(mPosition).getCardImageURL();
             int screen_orientation = v.getResources().getConfiguration().orientation;
-
-            if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
-                Context context = v.getContext();
-                Intent intent = new Intent(context, CardDetailActivity.class);
-                intent.putExtra(CardDetailActivity.KEY_CARD_URL, cardURL);
-                context.startActivity(intent);
-            } else {
-                FragmentManager fragmentManager =
-                        ((AppCompatActivity)v.getContext()).getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                CardDetailFragment cardDetailFragment = CardDetailFragment.newInstance(cardURL);
-                fragmentTransaction.replace(
-                        R.id.card_detail_land_fragment_container, cardDetailFragment);
-                fragmentTransaction.commit();
-            }
+            cardImageDisplayer.displayCardImage(v.getContext(), cardURL, screen_orientation);
         }
 
     }
