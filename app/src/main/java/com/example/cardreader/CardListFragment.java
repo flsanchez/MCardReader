@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -15,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.example.cardreader.databinding.FragmentCardListBinding;
 
 import java.util.ArrayList;
 
@@ -28,10 +31,10 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
     private static final String CARDLIST_PARAM = "CARDLIST_PARAM";
     private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
     private CardListAdapter mCardListAdapter;
-    private RecyclerView mRecyclerView;
     private LinearLayoutManager mLayoutManager;
     private CardList cardList = new CardList();
     private Boolean showFavorite;
+    private FragmentCardListBinding binding;
 
     public static CardListFragment newInstance(CardList cardList, Boolean showFavorite) {
         CardListFragment fragment = new CardListFragment();
@@ -55,16 +58,15 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.fragment_card_list, container, false);
-        mRecyclerView = view.findViewById(R.id.recycler_view);
-        mRecyclerView.setHasFixedSize(true);
+        binding =  DataBindingUtil.inflate(inflater, R.layout.fragment_card_list, container, false);
+        binding.recyclerView.setHasFixedSize(true);
         mCardListAdapter = new CardListAdapter(
-                view.getContext(), cardList, showFavorite,this);
-        mRecyclerView.setAdapter(mCardListAdapter);
-        mLayoutManager = new LinearLayoutManager(view.getContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+                this.getContext(), cardList, showFavorite,this);
+        binding.recyclerView.setAdapter(mCardListAdapter);
+        mLayoutManager = new LinearLayoutManager(this.getContext());
+        binding.recyclerView.setLayoutManager(mLayoutManager);
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override
