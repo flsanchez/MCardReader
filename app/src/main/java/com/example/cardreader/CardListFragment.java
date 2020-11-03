@@ -32,7 +32,6 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
     private static final String CARDLIST_PARAM = "CARDLIST_PARAM";
     private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
     private CardListAdapter mCardListAdapter;
-    private LinearLayoutManager mLayoutManager;
     private CardList cardList = new CardList();
     private Boolean showFavorite;
     private FragmentCardListBinding binding;
@@ -61,13 +60,17 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
                              Bundle savedInstanceState) {
         binding =  DataBindingUtil.inflate(
                 inflater, R.layout.fragment_card_list, container, false);
-        binding.recyclerView.setHasFixedSize(true);
-        mCardListAdapter = new CardListAdapter(
-                this.getContext(), cardList, showFavorite,this);
-        binding.recyclerView.setAdapter(mCardListAdapter);
-        mLayoutManager = new LinearLayoutManager(this.getContext());
-        binding.recyclerView.setLayoutManager(mLayoutManager);
 
+        if (cardList.size() == 0) {
+            binding.emptyView.setVisibility(View.VISIBLE);
+            binding.recyclerView.setVisibility(View.GONE);
+        } else {
+            binding.recyclerView.setHasFixedSize(true);
+            mCardListAdapter = new CardListAdapter(
+                    this.getContext(), cardList, showFavorite, this);
+            binding.recyclerView.setAdapter(mCardListAdapter);
+            binding.emptyView.setVisibility(View.GONE);
+        }
         return binding.getRoot();
     }
 
