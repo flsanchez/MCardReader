@@ -27,7 +27,7 @@ import java.util.ArrayList;
  * Use the {@link CardListFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CardListFragment extends Fragment implements CardImageDisplayer {
+public class CardListFragment extends Fragment implements CardImageDisplayer, CardFavoriteManager {
 
     private static final String CARDLIST_PARAM = "CARDLIST_PARAM";
     private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
@@ -67,7 +67,8 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
         } else {
             binding.recyclerView.setHasFixedSize(true);
             mCardListAdapter = new CardListAdapter(
-                    this.getContext(), cardList, showFavorite, this);
+                    this.getContext(), cardList, showFavorite,
+                    this, this);
             binding.recyclerView.setAdapter(mCardListAdapter);
             binding.emptyView.setVisibility(View.GONE);
         }
@@ -75,19 +76,28 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
     }
 
     @Override
-    public void displayCardImage(Context context, String cardUrl, int screen_orientation) {
+    public void displayCard(Card card) {
+        Context context = getContext();
+        int screen_orientation = context.getResources().getConfiguration().orientation;
         if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
             Intent intent = new Intent(context, CardDetailActivity.class);
-            intent.putExtra(CardDetailActivity.KEY_CARD_URL, cardUrl);
+            intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
             context.startActivity(intent);
         } else {
             FragmentManager fragmentManager =
                     ((AppCompatActivity)context).getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            CardDetailFragment cardDetailFragment = CardDetailFragment.newInstance(cardUrl);
+            CardDetailFragment cardDetailFragment =
+                    CardDetailFragment.newInstance(card.getCardImageURL());
             fragmentTransaction.replace(
                     R.id.card_detail_land_fragment_container, cardDetailFragment);
             fragmentTransaction.commit();
         }
+    }
+
+    @Override
+    public void toggleFavorite(Card card) {
+        card.setFavourite(!card.getFavourite());
+        mCardListAdapter.setCardList(cardList);
     }
 }

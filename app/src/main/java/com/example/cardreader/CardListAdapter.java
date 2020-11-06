@@ -16,50 +16,64 @@ import static
 
 public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardViewHolder> {
     private final LayoutInflater mInflater;
-    private final CardList cardList;
+    private CardList cardList;
     public StateRestorationPolicy stateRestorationPolicy = PREVENT_WHEN_EMPTY;
     private final Boolean showFavorite;
     private final CardImageDisplayer cardImageDisplayer;
+    private final CardFavoriteManager cardFavoriteManager;
     private CardRecyclerItemBinding binding;
 
-    public CardListAdapter(Context context, CardList cardList, Boolean showFavorite,
-                           CardImageDisplayer cardImageDisplayer) {
+    public CardListAdapter(Context context,
+                           CardList cardList,
+                           Boolean showFavorite,
+                           CardImageDisplayer cardImageDisplayer,
+                           CardFavoriteManager cardFavoriteManager) {
         mInflater = LayoutInflater.from(context);
         this.cardList = cardList;
         this.showFavorite = showFavorite;
         this.cardImageDisplayer = cardImageDisplayer;
+        this.cardFavoriteManager = cardFavoriteManager;
     }
 
-    class CardViewHolder extends RecyclerView.ViewHolder{
-        public int mPosition;
-        final CardListAdapter mAdapter;
+    public void setCardList(CardList cardList) {
+        this.cardList = cardList;
+        notifyDataSetChanged();
+    }
+
+    static class CardViewHolder extends RecyclerView.ViewHolder{
+        final CardFavoriteManager cardFavoriteManager;
         final CardImageDisplayer cardImageDisplayer;
         private CardRecyclerItemBinding binding;
+        private Card card;
 
-        public CardViewHolder(@NonNull CardRecyclerItemBinding binding, CardListAdapter adapter) {
+        public CardViewHolder(
+                @NonNull CardRecyclerItemBinding binding,
+                CardImageDisplayer cardImageDisplayer,
+                CardFavoriteManager cardFavoriteManager,
+                Boolean showFavorite
+        ) {
             super(binding.getRoot());
-            this.mAdapter = adapter;
             this.binding = binding;
-            this.cardImageDisplayer = adapter.cardImageDisplayer;
-            binding.imageButton.setOnClickListener(this::onClickShowImage);
+            this.cardImageDisplayer = cardImageDisplayer;
+            this.cardFavoriteManager = cardFavoriteManager;
+            binding.imageButton.setOnClickListener(view ->cardImageDisplayer.displayCard(card));
             if (showFavorite) {
-                binding.favoriteButton.setOnClickListener(this::onClickFavorite);
+                binding.favoriteButton.setOnClickListener(
+                        view -> cardFavoriteManager.toggleFavorite(card));
             } else {
                 binding.favoriteButton.setVisibility(View.GONE);
             }
         }
 
-        private void onClickFavorite(View v) {
-            Card card = cardList.get(mPosition);
-            card.setFavourite(!card.getFavourite());
-            mAdapter.notifyItemChanged(mPosition);
+        public void bindModel(Card card) {
+            binding.name.setText(card.getName());
+            binding.text.setText(card.getText());
+            binding.favoriteButton.setImageResource(
+                    card.getFavourite() ?
+                        android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
         }
 
-        public void onClickShowImage(View v) {
-            String cardURL = cardList.get(mPosition).getCardImageURL();
-            int screen_orientation = v.getResources().getConfiguration().orientation;
-            cardImageDisplayer.displayCardImage(v.getContext(), cardURL, screen_orientation);
-        }
+        public void setCard(Card card) { this.card = card; }
 
     }
 
@@ -69,18 +83,14 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         binding = DataBindingUtil.inflate(
                 mInflater, R.layout.card_recycler_item, parent, false);
-        return new CardViewHolder(binding, this);
+        return new CardViewHolder(binding, cardImageDisplayer, cardFavoriteManager, showFavorite);
     }
 
     @Override
     public void onBindViewHolder(@NonNull CardListAdapter.CardViewHolder holder, int position) {
         Card card = cardList.get(position);
-        holder.binding.name.setText(card.getName());
-        holder.binding.text.setText(card.getText());
-        holder.mPosition = position;
-        holder.binding.favoriteButton.setImageResource(
-                card.getFavourite() ?
-                        android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
+        holder.bindModel(card);
+        holder.setCard(card);
     }
 
     @Override
