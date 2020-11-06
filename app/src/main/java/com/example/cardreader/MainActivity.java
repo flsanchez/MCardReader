@@ -20,21 +20,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        CardList cardList = new CardList();
-        cardList.addItemsFromJSON(TAG, getResources().openRawResource(R.raw.zen));
-
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-        CardListFragment cardListFragment = CardListFragment.newInstance(cardList, showFavorite);
+        CardListFragment cardListFragment = CardListFragment.newInstance(showFavorite);
         fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
 
-        int screen_orientation = getResources().getConfiguration().orientation;
-        if (screen_orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            CardDetailFragment cardDetailFragment =
-                    CardDetailFragment.newInstance(cardList.get(0).getCardImageURL());
-            fragmentTransaction.add(R.id.card_detail_land_fragment_container, cardDetailFragment);
-        }
+//        int screen_orientation = getResources().getConfiguration().orientation;
+//        if (screen_orientation == Configuration.ORIENTATION_LANDSCAPE) {
+//            CardDetailFragment cardDetailFragment =
+//                    CardDetailFragment.newInstance(cardList.get(0).getCardImageURL());
+//            fragmentTransaction.add(R.id.card_detail_land_fragment_container, cardDetailFragment);
+//        }
 
         fragmentTransaction.commit();
 
@@ -42,15 +39,16 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showFavorite = !showFavorite;
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-                CardListFragment cardListFragment =
-                        CardListFragment.newInstance(
-                                showFavorite ? cardList : cardList.getFavorites(), showFavorite);
-                fragmentTransaction.replace(R.id.fragment_recycler_container, cardListFragment);
-                fragmentTransaction.commit();
+                //TODO REVISE FAVORITES
+//                showFavorite = !showFavorite;
+//                FragmentManager fragmentManager = getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//
+//                CardListFragment cardListFragment =
+//                        CardListFragment.newInstance(
+//                                showFavorite ? cardList : cardList.getFavorites(), showFavorite);
+//                fragmentTransaction.replace(R.id.fragment_recycler_container, cardListFragment);
+//                fragmentTransaction.commit();
             }
         });
     }

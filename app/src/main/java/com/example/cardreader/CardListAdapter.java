@@ -16,7 +16,7 @@ import static
 
 public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardViewHolder> {
     private final LayoutInflater mInflater;
-    private final CardList cardList;
+    private CardList cardList;
     public StateRestorationPolicy stateRestorationPolicy = PREVENT_WHEN_EMPTY;
     private final Boolean showFavorite;
     private final CardImageDisplayer cardImageDisplayer;
@@ -86,5 +86,10 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     @Override
     public int getItemCount() {
         return cardList.size();
+    }
+
+    public void updateCardList(CardList cardListUpdated) {
+        cardList = cardListUpdated;
+        notifyDataSetChanged();
     }
 }

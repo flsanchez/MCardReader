@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CardList extends ArrayList<Card> {
 
@@ -18,9 +19,7 @@ public class CardList extends ArrayList<Card> {
         super();
     }
 
-    public CardList (ArrayList<Card> arrayList) {
-        super(arrayList);
-    }
+    public CardList (List<Card> cardList) { super(cardList); }
 
     public void addItemsFromJSON(String TAG, InputStream inputStream) {
         try {
@@ -59,14 +58,14 @@ public class CardList extends ArrayList<Card> {
         return new String(builder);
     }
 
-    public CardList getFavorites() {
-        CardList favoriteCardList = new CardList();
-        for (Card card: this) {
-            if (card.getFavourite()) {
-                favoriteCardList.add(card);
-            }
-        }
-        return favoriteCardList;
-    }
+//    public CardList getFavorites() {
+//        CardList favoriteCardList = new CardList();
+//        for (Card card: this) {
+//            if (card.getFavourite()) {
+//                favoriteCardList.add(card);
+//            }
+//        }
+//        return favoriteCardList;
+//    }
 
 }

@@ -6,13 +6,14 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import com.example.cardreader.databinding.FragmentCardListBinding;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,17 +31,16 @@ import java.util.ArrayList;
  */
 public class CardListFragment extends Fragment implements CardImageDisplayer {
 
-    private static final String CARDLIST_PARAM = "CARDLIST_PARAM";
     private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
     private CardListAdapter mCardListAdapter;
     private CardList cardList = new CardList();
     private Boolean showFavorite;
     private FragmentCardListBinding binding;
+    private CardViewModel mCardViewModel;
 
-    public static CardListFragment newInstance(CardList cardList, Boolean showFavorite) {
+    public static CardListFragment newInstance(Boolean showFavorite) {
         CardListFragment fragment = new CardListFragment();
         Bundle args = new Bundle();
-        args.putSerializable(CARDLIST_PARAM, cardList);
         args.putBoolean(FAVORITE_PARAM, showFavorite);
         fragment.setArguments(args);
         return fragment;
@@ -49,10 +50,17 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            cardList =
-                    new CardList((ArrayList<Card>) getArguments().getSerializable(CARDLIST_PARAM));
             showFavorite = getArguments().getBoolean(FAVORITE_PARAM);
         }
+
+        mCardViewModel = ViewModelProviders.of(this).get(CardViewModel.class);
+        mCardViewModel.getAllWords().observe(this, new Observer<List<Card>>() {
+            @Override
+            public void onChanged(@Nullable final List<Card> cardListUpdated) {
+                mCardListAdapter.updateCardList(new CardList(cardListUpdated));
+            }
+        });
+
     }
 
     @Override
@@ -61,16 +69,16 @@ public class CardListFragment extends Fragment implements CardImageDisplayer {
         binding =  DataBindingUtil.inflate(
                 inflater, R.layout.fragment_card_list, container, false);
 
-        if (cardList.size() == 0) {
-            binding.emptyView.setVisibility(View.VISIBLE);
-            binding.recyclerView.setVisibility(View.GONE);
-        } else {
-            binding.recyclerView.setHasFixedSize(true);
-            mCardListAdapter = new CardListAdapter(
-                    this.getContext(), cardList, showFavorite, this);
-            binding.recyclerView.setAdapter(mCardListAdapter);
-            binding.emptyView.setVisibility(View.GONE);
-        }
+//        if (cardList.size() == 0) {
+//            binding.emptyView.setVisibility(View.VISIBLE);
+//            binding.recyclerView.setVisibility(View.GONE);
+//        } else {
+//            binding.emptyView.setVisibility(View.GONE);
+//        }
+
+        mCardListAdapter = new CardListAdapter(
+                this.getContext(), cardList, showFavorite, this);
+        binding.recyclerView.setAdapter(mCardListAdapter);
         return binding.getRoot();
     }
 
