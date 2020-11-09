@@ -77,22 +77,32 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
 
     @Override
     public void displayCard(Card card) {
-        Context context = getContext();
-        int screen_orientation = context.getResources().getConfiguration().orientation;
-        if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Intent intent = new Intent(context, CardDetailActivity.class);
-            intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
-            context.startActivity(intent);
-        } else {
-            FragmentManager fragmentManager =
-                    ((AppCompatActivity)context).getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            CardDetailFragment cardDetailFragment =
-                    CardDetailFragment.newInstance(card.getCardImageURL());
-            fragmentTransaction.replace(
-                    R.id.card_detail_land_fragment_container, cardDetailFragment);
-            fragmentTransaction.commit();
+        Context context = getActivity();
+        if (context != null) {
+            int screen_orientation = context.getResources().getConfiguration().orientation;
+            if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
+                displayCardPortrait(card, context);
+            } else {
+                displayCardLandscape(card, context);
+            }
         }
+    }
+
+    public void displayCardPortrait(Card card, Context context) {
+        Intent intent = new Intent(context, CardDetailActivity.class);
+        intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
+        context.startActivity(intent);
+    }
+
+    public void displayCardLandscape(Card card, Context context) {
+        FragmentManager fragmentManager =
+                ((AppCompatActivity)context).getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        CardDetailFragment cardDetailFragment =
+                CardDetailFragment.newInstance(card.getCardImageURL());
+        fragmentTransaction.replace(
+                R.id.card_detail_land_fragment_container, cardDetailFragment);
+        fragmentTransaction.commit();
     }
 
     @Override

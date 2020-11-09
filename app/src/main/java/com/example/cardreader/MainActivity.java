@@ -23,20 +23,16 @@ public class MainActivity extends AppCompatActivity {
         CardList cardList = new CardList();
         cardList.addItemsFromJSON(TAG, getResources().openRawResource(R.raw.zen));
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
 
         CardListFragment cardListFragment = CardListFragment.newInstance(cardList, showFavorite);
         fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
+        fragmentTransaction.commit();
 
         int screen_orientation = getResources().getConfiguration().orientation;
         if (screen_orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            CardDetailFragment cardDetailFragment =
-                    CardDetailFragment.newInstance(cardList.get(0).getCardImageURL());
-            fragmentTransaction.add(R.id.card_detail_land_fragment_container, cardDetailFragment);
+            cardListFragment.displayCardLandscape(cardList.get(0), this);
         }
-
-        fragmentTransaction.commit();
 
         FloatingActionButton fab = findViewById(R.id.fab_favorites);
         fab.setOnClickListener(new View.OnClickListener() {
