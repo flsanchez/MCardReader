@@ -96,7 +96,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     }
 
     @Override
-    public void toggleFavorite(Card card) {
+    public void toggleFavoriteCard(Card card) {
         card.setFavourite(!card.getFavourite());
         mCardListAdapter.setCardList(cardList);
     }

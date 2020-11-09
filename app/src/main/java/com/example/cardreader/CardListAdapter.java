@@ -43,8 +43,8 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     static class CardViewHolder extends RecyclerView.ViewHolder{
         final CardFavoriteManager cardFavoriteManager;
         final CardImageDisplayer cardImageDisplayer;
+        private final Boolean showFavorite;
         private CardRecyclerItemBinding binding;
-        private Card card;
 
         public CardViewHolder(
                 @NonNull CardRecyclerItemBinding binding,
@@ -56,25 +56,24 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
             this.binding = binding;
             this.cardImageDisplayer = cardImageDisplayer;
             this.cardFavoriteManager = cardFavoriteManager;
-            binding.imageButton.setOnClickListener(view ->cardImageDisplayer.displayCard(card));
+            this.showFavorite = showFavorite;
+        }
+
+        public void bindModel(Card model) {
+            binding.name.setText(model.getName());
+            binding.text.setText(model.getText());
+            binding.imageButton.setOnClickListener((view) ->cardImageDisplayer.displayCard(model));
             if (showFavorite) {
+                binding.favoriteButton.setImageResource(
+                        model.getFavourite() ? android.R.drawable.btn_star_big_on :
+                                android.R.drawable.btn_star_big_off
+                );
                 binding.favoriteButton.setOnClickListener(
-                        view -> cardFavoriteManager.toggleFavorite(card));
+                        (view) -> cardFavoriteManager.toggleFavoriteCard(model));
             } else {
                 binding.favoriteButton.setVisibility(View.GONE);
             }
         }
-
-        public void bindModel(Card card) {
-            binding.name.setText(card.getName());
-            binding.text.setText(card.getText());
-            binding.favoriteButton.setImageResource(
-                    card.getFavourite() ?
-                        android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
-        }
-
-        public void setCard(Card card) { this.card = card; }
-
     }
 
     @NonNull
@@ -88,9 +87,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
 
     @Override
     public void onBindViewHolder(@NonNull CardListAdapter.CardViewHolder holder, int position) {
-        Card card = cardList.get(position);
-        holder.bindModel(card);
-        holder.setCard(card);
+        holder.bindModel(cardList.get(position));
     }
 
     @Override
