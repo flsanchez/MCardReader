@@ -25,15 +25,12 @@ public class MainActivity extends AppCompatActivity {
 
         CardListFragment cardListFragment = CardListFragment.newInstance(showFavorite);
         fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
+        fragmentTransaction.commit();
 
 //        int screen_orientation = getResources().getConfiguration().orientation;
 //        if (screen_orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            CardDetailFragment cardDetailFragment =
-//                    CardDetailFragment.newInstance(cardList.get(0).getCardImageURL());
-//            fragmentTransaction.add(R.id.card_detail_land_fragment_container, cardDetailFragment);
+//            cardListFragment.displayCardLandscape(cardList.get(0), this);
 //        }
-
-        fragmentTransaction.commit();
 
         FloatingActionButton fab = findViewById(R.id.fab_favorites);
         fab.setOnClickListener(new View.OnClickListener() {
