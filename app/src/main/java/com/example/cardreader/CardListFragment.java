@@ -12,6 +12,7 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -21,7 +22,6 @@ import android.view.ViewGroup;
 
 import com.example.cardreader.databinding.FragmentCardListBinding;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,11 +54,12 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         }
 
         mCardViewModel = ViewModelProviders.of(this).get(CardViewModel.class);
-        mCardViewModel.getAllWords().observe(this, new Observer<List<Card>>() {
-            @Override
-            public void onChanged(@Nullable final List<Card> cardListUpdated) {
-                mCardListAdapter.updateCardList(new CardList(cardListUpdated));
-            }
+
+        LiveData<List<Card>> liveCardList =
+                showFavorite ? mCardViewModel.getAllCards() : mCardViewModel.getFavoriteCards();
+        liveCardList.observe(this, (List<Card> cardListUpdated) -> {
+            cardList = new CardList(cardListUpdated);
+            mCardListAdapter.setCardList(cardList);
         });
 
     }
@@ -68,13 +69,6 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
                              Bundle savedInstanceState) {
         binding =  DataBindingUtil.inflate(
                 inflater, R.layout.fragment_card_list, container, false);
-
-//        if (cardList.size() == 0) {
-//            binding.emptyView.setVisibility(View.VISIBLE);
-//            binding.recyclerView.setVisibility(View.GONE);
-//        } else {
-//            binding.emptyView.setVisibility(View.GONE);
-//        }
 
         mCardListAdapter = new CardListAdapter(
                 this.getContext(), cardList, showFavorite,
@@ -116,6 +110,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     @Override
     public void toggleFavoriteCard(Card card) {
         card.setFavourite(!card.getFavourite());
+        mCardViewModel.update(card);
         mCardListAdapter.setCardList(cardList);
     }
 }

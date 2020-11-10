@@ -20,33 +20,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        launchCardListFragment();
+
+        FloatingActionButton fab = findViewById(R.id.fab_favorites);
+        fab.setOnClickListener((view) -> {
+            showFavorite = !showFavorite;
+            launchCardListFragment();
+        });
+    }
+
+    private void launchCardListFragment () {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         CardListFragment cardListFragment = CardListFragment.newInstance(showFavorite);
-        fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
+        fragmentTransaction.replace(R.id.fragment_recycler_container, cardListFragment);
         fragmentTransaction.commit();
-
-//        int screen_orientation = getResources().getConfiguration().orientation;
-//        if (screen_orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            cardListFragment.displayCardLandscape(cardList.get(0), this);
-//        }
-
-        FloatingActionButton fab = findViewById(R.id.fab_favorites);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO REVISE FAVORITES
-//                showFavorite = !showFavorite;
-//                FragmentManager fragmentManager = getSupportFragmentManager();
-//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//
-//                CardListFragment cardListFragment =
-//                        CardListFragment.newInstance(
-//                                showFavorite ? cardList : cardList.getFavorites(), showFavorite);
-//                fragmentTransaction.replace(R.id.fragment_recycler_container, cardListFragment);
-//                fragmentTransaction.commit();
-            }
-        });
     }
 }

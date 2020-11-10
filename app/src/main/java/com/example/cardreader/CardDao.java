@@ -18,9 +18,12 @@ public interface CardDao {
     @Query("SELECT * from card_table ORDER BY id ASC")
     LiveData<List<Card>> getAllCards();
 
+    @Query("SELECT * from card_table WHERE is_favourite=1 ORDER BY id ASC")
+    LiveData<List<Card>> getFavoriteCards();
+
     @Query("SELECT * from card_table LIMIT 1")
     Card[] getAnyCard();
-// TODO revise favorites
-//    @Query("UPDATE card_table SET is_favourite=:isFavourite WHERE id=:id")
-//    void update(int id, Boolean isFavourite);
+
+    @Query("UPDATE card_table SET is_favourite=:isFavourite WHERE id=:id")
+    void update(int id, Boolean isFavourite);
 }

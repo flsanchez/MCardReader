@@ -8,16 +8,18 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 public class CardViewModel extends AndroidViewModel {
-    private CardRepository mRepository;
-    private LiveData<List<Card>> mAllWords;
+    private final CardRepository mRepository;
 
     public CardViewModel (Application application) {
         super(application);
         mRepository = new CardRepository(application);
-        mAllWords = mRepository.getAllCards();
     }
 
-    LiveData<List<Card>> getAllWords() { return mAllWords; }
+    LiveData<List<Card>> getAllCards() { return mRepository.getAllCards(); }
+
+    LiveData<List<Card>> getFavoriteCards() { return mRepository.getFavoriteCards(); }
 
     public void deleteAll() {mRepository.deleteAll();}
+
+    public void update(Card card) {mRepository.update(card);}
 }

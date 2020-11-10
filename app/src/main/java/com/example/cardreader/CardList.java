@@ -57,15 +57,4 @@ public class CardList extends ArrayList<Card> {
         }
         return new String(builder);
     }
-
-//    public CardList getFavorites() {
-//        CardList favoriteCardList = new CardList();
-//        for (Card card: this) {
-//            if (card.getFavourite()) {
-//                favoriteCardList.add(card);
-//            }
-//        }
-//        return favoriteCardList;
-//    }
-
 }

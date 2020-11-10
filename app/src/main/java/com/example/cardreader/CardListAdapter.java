@@ -94,9 +94,4 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     public int getItemCount() {
         return cardList.size();
     }
-
-    public void updateCardList(CardList cardListUpdated) {
-        cardList = cardListUpdated;
-        notifyDataSetChanged();
-    }
 }

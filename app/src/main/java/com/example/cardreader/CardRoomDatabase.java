@@ -53,8 +53,6 @@ public abstract class CardRoomDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(final Void... params) {
-            mDao.deleteAll();
-            // If we have no cards, then create the initial list of words
             if (mDao.getAnyCard().length < 1) {
                 CardList cardList = new CardList();
                 cardList.addItemsFromJSON("DB", cardListStream);
