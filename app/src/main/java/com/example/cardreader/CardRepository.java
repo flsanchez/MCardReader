@@ -22,7 +22,7 @@ public class CardRepository {
     public void deleteAll() {new deleteAllAsyncTask(mDao).execute();}
 
     private static class deleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
-        private CardDao mAsyncTaskDao;
+        private final CardDao mAsyncTaskDao;
 
         deleteAllAsyncTask(CardDao dao) {
             mAsyncTaskDao = dao;
@@ -41,7 +41,7 @@ public class CardRepository {
 
     private static class updateAsyncTask extends AsyncTask<Card, Void, Void> {
 
-        private CardDao mAsyncTaskDao;
+        private final CardDao mAsyncTaskDao;
 
         updateAsyncTask(CardDao dao) {
             mAsyncTaskDao = dao;
