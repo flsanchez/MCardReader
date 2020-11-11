@@ -37,6 +37,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     private Boolean showFavorite;
     private FragmentCardListBinding binding;
     private CardViewModel mCardViewModel;
+    private LiveData<List<Card>> liveCardList;
 
     public static CardListFragment newInstance(Boolean showFavorite) {
         CardListFragment fragment = new CardListFragment();
@@ -54,8 +55,12 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         }
 
         mCardViewModel = ViewModelProviders.of(this).get(CardViewModel.class);
+        mCardListAdapter = new CardListAdapter(
+                this.getContext(),this, this);
+        mCardListAdapter.setShowFavorite(showFavorite);
+        mCardListAdapter.setCardList(cardList);
 
-        LiveData<List<Card>> liveCardList =
+        liveCardList =
                 showFavorite ? mCardViewModel.getAllCards() : mCardViewModel.getFavoriteCards();
         liveCardList.observe(this, (List<Card> cardListUpdated) -> {
             cardList = new CardList(cardListUpdated);
@@ -70,9 +75,6 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         binding =  DataBindingUtil.inflate(
                 inflater, R.layout.fragment_card_list, container, false);
 
-        mCardListAdapter = new CardListAdapter(
-                this.getContext(), cardList, showFavorite,
-                    this, this);
         binding.recyclerView.setAdapter(mCardListAdapter);
         return binding.getRoot();
     }
@@ -80,22 +82,20 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     @Override
     public void displayCard(Card card) {
         Context context = this.getActivity();
-        if (context != null) {
-            int screen_orientation = this.getResources().getConfiguration().orientation;
-            if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
-                Intent intent = new Intent(context, CardDetailActivity.class);
-                intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
-                context.startActivity(intent);
-            } else {
-                FragmentManager fragmentManager =
-                        ((AppCompatActivity) context).getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                CardDetailFragment cardDetailFragment =
-                        CardDetailFragment.newInstance(card.getCardImageURL());
-                fragmentTransaction.replace(
-                        R.id.card_detail_land_fragment_container, cardDetailFragment);
-                fragmentTransaction.commit();
-            }
+        int screen_orientation = this.getResources().getConfiguration().orientation;
+        if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Intent intent = new Intent(context, CardDetailActivity.class);
+            intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
+            context.startActivity(intent);
+        } else {
+            FragmentManager fragmentManager =
+                    ((AppCompatActivity) context).getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            CardDetailFragment cardDetailFragment =
+                    CardDetailFragment.newInstance(card.getCardImageURL());
+            fragmentTransaction.replace(
+                    R.id.card_detail_land_fragment_container, cardDetailFragment);
+            fragmentTransaction.commit();
         }
     }
 
@@ -104,5 +104,16 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         card.setFavourite(!card.getFavourite());
         mCardViewModel.update(card);
         mCardListAdapter.setCardList(cardList);
+    }
+
+    public void setShowFavorite(Boolean showFavorite) {
+        this.showFavorite = showFavorite;
+        mCardListAdapter.setShowFavorite(showFavorite);
+        liveCardList =
+                showFavorite ? mCardViewModel.getAllCards() : mCardViewModel.getFavoriteCards();
+        liveCardList.observe(this, (List<Card> cardListUpdated) -> {
+            cardList = new CardList(cardListUpdated);
+            mCardListAdapter.setCardList(cardList);
+        });
     }
 }

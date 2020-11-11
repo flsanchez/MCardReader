@@ -20,21 +20,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        launchCardListFragment();
-
-        FloatingActionButton fab = findViewById(R.id.fab_favorites);
-        fab.setOnClickListener((view) -> {
-            showFavorite = !showFavorite;
-            launchCardListFragment();
-        });
-    }
-
-    private void launchCardListFragment () {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         CardListFragment cardListFragment = CardListFragment.newInstance(showFavorite);
-        fragmentTransaction.replace(R.id.fragment_recycler_container, cardListFragment);
+        fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
         fragmentTransaction.commit();
+
+        FloatingActionButton fab = findViewById(R.id.fab_favorites);
+
+        fab.setOnClickListener((view) -> {
+            showFavorite = !showFavorite;
+            cardListFragment.setShowFavorite(showFavorite);
+        });
     }
 }

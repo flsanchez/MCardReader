@@ -18,19 +18,15 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
     private final LayoutInflater mInflater;
     private CardList cardList;
     public StateRestorationPolicy stateRestorationPolicy = PREVENT_WHEN_EMPTY;
-    private final Boolean showFavorite;
+    private Boolean showFavorite = false;
     private final CardImageDisplayer cardImageDisplayer;
     private final CardFavoriteManager cardFavoriteManager;
     private CardRecyclerItemBinding binding;
 
     public CardListAdapter(Context context,
-                           CardList cardList,
-                           Boolean showFavorite,
                            CardImageDisplayer cardImageDisplayer,
                            CardFavoriteManager cardFavoriteManager) {
         mInflater = LayoutInflater.from(context);
-        this.cardList = cardList;
-        this.showFavorite = showFavorite;
         this.cardImageDisplayer = cardImageDisplayer;
         this.cardFavoriteManager = cardFavoriteManager;
     }
@@ -40,24 +36,49 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
         notifyDataSetChanged();
     }
 
+    public void setShowFavorite(Boolean showFavorite){
+        this.showFavorite = showFavorite;
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public CardListAdapter.CardViewHolder
+    onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        binding = DataBindingUtil.inflate(
+                mInflater, R.layout.card_recycler_item, parent, false);
+        return new CardViewHolder(binding, cardImageDisplayer, cardFavoriteManager);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull CardListAdapter.CardViewHolder holder, int position) {
+        holder.setShowFavorite(showFavorite);
+        holder.bindModel(cardList.get(position));
+    }
+
+    @Override
+    public int getItemCount() {
+        return cardList.size();
+    }
+
     static class CardViewHolder extends RecyclerView.ViewHolder{
         final CardFavoriteManager cardFavoriteManager;
         final CardImageDisplayer cardImageDisplayer;
-        private final Boolean showFavorite;
+        private Boolean showFavorite;
         private CardRecyclerItemBinding binding;
 
         public CardViewHolder(
                 @NonNull CardRecyclerItemBinding binding,
                 CardImageDisplayer cardImageDisplayer,
-                CardFavoriteManager cardFavoriteManager,
-                Boolean showFavorite
+                CardFavoriteManager cardFavoriteManager
         ) {
             super(binding.getRoot());
             this.binding = binding;
             this.cardImageDisplayer = cardImageDisplayer;
             this.cardFavoriteManager = cardFavoriteManager;
-            this.showFavorite = showFavorite;
         }
+
+        public void setShowFavorite(Boolean showFavorite){ this.showFavorite = showFavorite; }
 
         public void bindModel(Card model) {
             binding.name.setText(model.getName());
@@ -70,28 +91,10 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
                 );
                 binding.favoriteButton.setOnClickListener(
                         (view) -> cardFavoriteManager.toggleFavoriteCard(model));
+                binding.favoriteButton.setVisibility(View.VISIBLE);
             } else {
                 binding.favoriteButton.setVisibility(View.GONE);
             }
         }
-    }
-
-    @NonNull
-    @Override
-    public CardListAdapter.CardViewHolder
-    onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        binding = DataBindingUtil.inflate(
-                mInflater, R.layout.card_recycler_item, parent, false);
-        return new CardViewHolder(binding, cardImageDisplayer, cardFavoriteManager, showFavorite);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull CardListAdapter.CardViewHolder holder, int position) {
-        holder.bindModel(cardList.get(position));
-    }
-
-    @Override
-    public int getItemCount() {
-        return cardList.size();
     }
 }
