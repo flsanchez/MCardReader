@@ -15,9 +15,9 @@ public class CardViewModel extends AndroidViewModel {
         mRepository = new CardRepository(application);
     }
 
-    LiveData<List<Card>> getAllCards() { return mRepository.getAllCards(); }
-
-    LiveData<List<Card>> getFavoriteCards() { return mRepository.getFavoriteCards(); }
+    LiveData<List<Card>> getCardList(Boolean filterFavorites) {
+        return mRepository.getCardList(filterFavorites);
+    }
 
     public void deleteAll() {mRepository.deleteAll();}
 

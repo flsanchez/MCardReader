@@ -15,9 +15,9 @@ public class CardRepository {
         mDao = db.cardDao();
     }
 
-    LiveData<List<Card>> getAllCards() { return mDao.getAllCards(); }
-
-    LiveData<List<Card>> getFavoriteCards() { return mDao.getFavoriteCards(); }
+    LiveData<List<Card>> getCardList(Boolean filterFavorites) {
+        return filterFavorites ? mDao.getAllCards() : mDao.getFavoriteCards();
+    }
 
     public void deleteAll() {new deleteAllAsyncTask(mDao).execute();}
 

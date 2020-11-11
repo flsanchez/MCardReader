@@ -34,10 +34,8 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
     private CardListAdapter mCardListAdapter;
     private CardList cardList = new CardList();
-    private Boolean showFavorite;
     private FragmentCardListBinding binding;
     private CardViewModel mCardViewModel;
-    private LiveData<List<Card>> liveCardList;
 
     public static CardListFragment newInstance(Boolean showFavorite) {
         CardListFragment fragment = new CardListFragment();
@@ -50,9 +48,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            showFavorite = getArguments().getBoolean(FAVORITE_PARAM);
-        }
+        Boolean showFavorite = getArguments().getBoolean(FAVORITE_PARAM);
 
         mCardViewModel = ViewModelProviders.of(this).get(CardViewModel.class);
         mCardListAdapter = new CardListAdapter(
@@ -60,12 +56,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         mCardListAdapter.setShowFavorite(showFavorite);
         mCardListAdapter.setCardList(cardList);
 
-        liveCardList =
-                showFavorite ? mCardViewModel.getAllCards() : mCardViewModel.getFavoriteCards();
-        liveCardList.observe(this, (List<Card> cardListUpdated) -> {
-            cardList = new CardList(cardListUpdated);
-            mCardListAdapter.setCardList(cardList);
-        });
+        updateCardListObserve(showFavorite);
 
     }
 
@@ -74,29 +65,41 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
                              Bundle savedInstanceState) {
         binding =  DataBindingUtil.inflate(
                 inflater, R.layout.fragment_card_list, container, false);
-
         binding.recyclerView.setAdapter(mCardListAdapter);
         return binding.getRoot();
     }
 
     @Override
     public void displayCard(Card card) {
-        Context context = this.getActivity();
-        int screen_orientation = this.getResources().getConfiguration().orientation;
-        if (screen_orientation == Configuration.ORIENTATION_PORTRAIT) {
-            Intent intent = new Intent(context, CardDetailActivity.class);
-            intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
-            context.startActivity(intent);
+        if (isScreenPortrait()) {
+            displayCardPortrait(card);
         } else {
-            FragmentManager fragmentManager =
-                    ((AppCompatActivity) context).getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            CardDetailFragment cardDetailFragment =
-                    CardDetailFragment.newInstance(card.getCardImageURL());
-            fragmentTransaction.replace(
-                    R.id.card_detail_land_fragment_container, cardDetailFragment);
-            fragmentTransaction.commit();
+            displayCardLandscape(card);
         }
+    }
+
+    public Boolean isScreenPortrait() {
+        int screen_orientation = this.getResources().getConfiguration().orientation;
+        return screen_orientation == Configuration.ORIENTATION_PORTRAIT;
+    }
+
+    public void displayCardPortrait(Card card) {
+        Context context = this.getActivity();
+        Intent intent = new Intent(context, CardDetailActivity.class);
+        intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
+        context.startActivity(intent);
+    }
+
+    public void displayCardLandscape(Card card) {
+        Context context = this.getActivity();
+        FragmentManager fragmentManager =
+                ((AppCompatActivity) context).getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        CardDetailFragment cardDetailFragment =
+                CardDetailFragment.newInstance(card.getCardImageURL());
+        fragmentTransaction.replace(
+                R.id.card_detail_land_fragment_container, cardDetailFragment);
+        fragmentTransaction.commit();
     }
 
     @Override
@@ -106,14 +109,16 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         mCardListAdapter.setCardList(cardList);
     }
 
-    public void setShowFavorite(Boolean showFavorite) {
-        this.showFavorite = showFavorite;
+    public void toggleFavoriteList(Boolean showFavorite) {
+        updateCardListObserve(showFavorite);
         mCardListAdapter.setShowFavorite(showFavorite);
-        liveCardList =
-                showFavorite ? mCardViewModel.getAllCards() : mCardViewModel.getFavoriteCards();
-        liveCardList.observe(this, (List<Card> cardListUpdated) -> {
-            cardList = new CardList(cardListUpdated);
-            mCardListAdapter.setCardList(cardList);
+    }
+
+    private void updateCardListObserve(Boolean showFavorite) {
+        mCardViewModel.getCardList(showFavorite).observe(
+                this, (List<Card> cardListUpdated) -> {
+                    cardList = new CardList(cardListUpdated);
+                    mCardListAdapter.setCardList(cardList);
         });
     }
 }
