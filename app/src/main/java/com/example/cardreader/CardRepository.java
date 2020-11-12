@@ -7,6 +7,8 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
+import javax.xml.transform.Result;
+
 public class CardRepository {
     private final CardDao mDao;
 
@@ -21,16 +23,12 @@ public class CardRepository {
 
     public void deleteAll() {new deleteAllAsyncTask(mDao).execute();}
 
-    private static class deleteAllAsyncTask extends AsyncTask<Void, Void, Void> {
-        private final CardDao mAsyncTaskDao;
-
-        deleteAllAsyncTask(CardDao dao) {
-            mAsyncTaskDao = dao;
-        }
+    private static class deleteAllAsyncTask extends CardAsyncTask<Void, Void, Void> {
+        deleteAllAsyncTask(CardDao dao) { super(dao); }
 
         @Override
         protected Void doInBackground(Void... voids) {
-            mAsyncTaskDao.deleteAll();
+            getAsyncTaskDao().deleteAll();
             return null;
         }
     }
@@ -39,20 +37,16 @@ public class CardRepository {
         new updateAsyncTask(mDao).execute(card);
     }
 
-    private static class updateAsyncTask extends AsyncTask<Card, Void, Void> {
-
-        private final CardDao mAsyncTaskDao;
-
-        updateAsyncTask(CardDao dao) {
-            mAsyncTaskDao = dao;
-        }
+    private static class updateAsyncTask extends CardAsyncTask<Card, Void, Void> {
+        updateAsyncTask(CardDao dao) { super(dao); }
 
         @Override
         protected Void doInBackground(final Card... params) {
             Card card = params[0];
-            mAsyncTaskDao.update(card.getId(), card.getFavourite());
+            getAsyncTaskDao().update(card.getId(), card.getFavourite());
             return null;
         }
     }
 
 }
+
