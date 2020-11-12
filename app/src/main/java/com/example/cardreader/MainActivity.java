@@ -1,11 +1,13 @@
 package com.example.cardreader;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 
+import com.example.cardreader.databinding.ActivityMainBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -15,20 +17,28 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        ActivityMainBinding binding =
+                DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        CardListFragment cardListFragment = getOrCreateCardListFragment();
+        getSupportFragmentManager().
+                beginTransaction().
+                replace(R.id.fragment_recycler_container, cardListFragment).
+                commit();
 
-        CardListFragment cardListFragment = CardListFragment.newInstance(showFavorite);
-        fragmentTransaction.add(R.id.fragment_recycler_container, cardListFragment);
-        fragmentTransaction.commit();
-
-        FloatingActionButton fab = findViewById(R.id.fab_favorites);
-
-        fab.setOnClickListener((view) -> {
+        binding.fabFavorites.setOnClickListener((view) -> {
             showFavorite = !showFavorite;
-            cardListFragment.toggleFavoriteList(showFavorite);
+            getOrCreateCardListFragment().toggleFavoriteList(showFavorite);
         });
+    }
+
+    private CardListFragment getOrCreateCardListFragment() {
+        CardListFragment cardListFragment =
+                (CardListFragment) getSupportFragmentManager().
+                        findFragmentById(R.id.fragment_recycler_container);
+        if (cardListFragment == null) {
+            cardListFragment = CardListFragment.newInstance(showFavorite);
+        }
+        return cardListFragment;
     }
 }
