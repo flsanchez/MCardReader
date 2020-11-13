@@ -3,7 +3,6 @@ package com.example.cardreader;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.io.Serializable;
@@ -28,46 +27,34 @@ public class Card implements Serializable {
     private String scryfallId;
 
     @NonNull
-    @ColumnInfo(name="card_image_url")
-    private String cardImageURL;
-
-    @NonNull
     @ColumnInfo(name="is_favourite")
     private Boolean isFavourite;
-
-    @Ignore
-    public Card (int id, @NonNull String name, @NonNull String text, @NonNull String scryfallId) {
-        this.id = id;
-        this.name = name;
-        this.text = text;
-        this.scryfallId = scryfallId;
-        this.cardImageURL =
-                String.format("https://api.scryfall.com/cards/%s?format=image", scryfallId);
-        this.isFavourite = false;
-    }
 
     public Card (@NonNull String name, @NonNull String text, @NonNull String scryfallId) {
         this.name = name;
         this.text = text;
         this.scryfallId = scryfallId;
-        this.cardImageURL =
-                String.format("https://api.scryfall.com/cards/%s?format=image", scryfallId);
         this.isFavourite = false;
     }
 
     public int getId() {return id;}
 
+    @NonNull
     public String getText() {
         return text;
     }
 
+    @NonNull
     public String getName() {
         return name;
     }
 
-    public String getScryfallId() {return scryfallId;}
+    @NonNull
+    public String getScryfallId() { return scryfallId; }
 
-    public String getCardImageURL() { return cardImageURL; }
+    public String getCardImageURL() {
+        return String.format("https://api.scryfall.com/cards/%s?format=image", scryfallId);
+    }
 
     public Boolean getFavourite() {
         return isFavourite;
@@ -75,9 +62,18 @@ public class Card implements Serializable {
 
     public void setId(int id) {this.id = id;}
 
-    public void setCardImageURL(String cardImageURL) { this.cardImageURL = cardImageURL; }
+    public void setText(@NonNull String text) {
+        this.text = text;
+    }
+
+    public void setName(@NonNull String name) {
+        this.name = name;
+    }
+
+    public void setScryfallId(@NonNull String scryfallId) { this.scryfallId = scryfallId; }
 
     public void setFavourite(Boolean favourite) {
         isFavourite = favourite;
     }
+
 }

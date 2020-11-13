@@ -12,7 +12,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import java.io.InputStream;
 
-@Database(entities = {Card.class}, version = 1, exportSchema = false)
+@Database(entities = {Card.class}, version = 2, exportSchema = false)
 public abstract class CardRoomDatabase extends RoomDatabase {
     public abstract CardDao cardDao();
 
@@ -33,7 +33,6 @@ public abstract class CardRoomDatabase extends RoomDatabase {
                                 }
                             })
                             .build();
-
                 }
             }
         }
