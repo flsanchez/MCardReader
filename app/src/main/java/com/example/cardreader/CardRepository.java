@@ -1,13 +1,10 @@
 package com.example.cardreader;
 
 import android.app.Application;
-import android.os.AsyncTask;
 
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
-
-import javax.xml.transform.Result;
 
 public class CardRepository {
     private final CardDao mDao;

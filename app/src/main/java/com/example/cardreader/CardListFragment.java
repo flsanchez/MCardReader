@@ -8,7 +8,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
@@ -88,21 +87,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     }
 
     private void displayCardLandscape(Card card) {
-        getOrCreateCardDetailFragment().displayCard(card);
-    }
-
-    private CardDetailFragment getOrCreateCardDetailFragment() {
-        CardDetailFragment cardDetailFragment =
-                (CardDetailFragment) getFragmentManager().
-                        findFragmentById(R.id.card_detail_fragment_container);
-        if (cardDetailFragment == null) {
-            cardDetailFragment = CardDetailFragment.newInstance();
-            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-            fragmentTransaction.replace(
-                    R.id.card_detail_fragment_container, cardDetailFragment);
-            fragmentTransaction.commitNow();
-        }
-        return cardDetailFragment;
+        CardDetailFragment.getOrCreateCardDetailFragment(getFragmentManager()).displayCard(card);
     }
 
     @Override

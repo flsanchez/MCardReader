@@ -2,8 +2,6 @@ package com.example.cardreader;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
 import android.view.View;
@@ -22,28 +20,14 @@ public class CardDetailActivity extends AppCompatActivity {
         ActivityCardDetailBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_card_detail);
         card = (Card) getIntent().getExtras().getSerializable(KEY_CARD);
-        cardDetailFragment = getOrCreateCardDetailFragment();
+        cardDetailFragment =
+                CardDetailFragment.getOrCreateCardDetailFragment(getSupportFragmentManager());
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         cardDetailFragment.displayCard(card);
-    }
-
-    private CardDetailFragment getOrCreateCardDetailFragment() {
-        CardDetailFragment cardDetailFragment =
-                (CardDetailFragment) getSupportFragmentManager().
-                        findFragmentById(R.id.card_detail_fragment_container);
-        if (cardDetailFragment == null) {
-            cardDetailFragment = CardDetailFragment.newInstance();
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(
-                    R.id.card_detail_fragment_container, cardDetailFragment);
-            fragmentTransaction.commit();
-        }
-        return cardDetailFragment;
     }
 
     public void onClickCardImage(View view) {
