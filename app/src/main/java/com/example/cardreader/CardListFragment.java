@@ -6,14 +6,9 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
 import android.view.LayoutInflater;
@@ -83,23 +78,31 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         return screen_orientation == Configuration.ORIENTATION_PORTRAIT;
     }
 
-    public void displayCardPortrait(Card card) {
+    private void displayCardPortrait(Card card) {
         Context context = this.getActivity();
         Intent intent = new Intent(context, CardDetailActivity.class);
-        intent.putExtra(CardDetailActivity.KEY_CARD_URL, card.getCardImageURL());
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(CardDetailActivity.KEY_CARD, card);
+        intent.putExtras(bundle);
         context.startActivity(intent);
     }
 
-    public void displayCardLandscape(Card card) {
-        Context context = this.getActivity();
-        FragmentManager fragmentManager =
-                ((AppCompatActivity) context).getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    private void displayCardLandscape(Card card) {
+        getOrCreateCardDetailFragment().displayCard(card);
+    }
+
+    private CardDetailFragment getOrCreateCardDetailFragment() {
         CardDetailFragment cardDetailFragment =
-                CardDetailFragment.newInstance(card.getCardImageURL());
-        fragmentTransaction.replace(
-                R.id.card_detail_land_fragment_container, cardDetailFragment);
-        fragmentTransaction.commit();
+                (CardDetailFragment) getFragmentManager().
+                        findFragmentById(R.id.card_detail_fragment_container);
+        if (cardDetailFragment == null) {
+            cardDetailFragment = CardDetailFragment.newInstance();
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(
+                    R.id.card_detail_fragment_container, cardDetailFragment);
+            fragmentTransaction.commitNow();
+        }
+        return cardDetailFragment;
     }
 
     @Override
