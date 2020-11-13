@@ -109,4 +109,12 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
                     mCardListAdapter.setCardList(cardList);
         });
     }
+
+    public void deleteDB() {
+        mCardViewModel.deleteAll();
+    }
+
+    public void clearFavorites() {
+        mCardViewModel.clearFavorites();
+    }
 }

@@ -18,7 +18,11 @@ public class CardRepository {
         return filterFavorites ? mDao.getAllCards() : mDao.getFavoriteCards();
     }
 
-    public void deleteAll() {new deleteAllAsyncTask(mDao).execute();}
+    public void deleteAll() { new deleteAllAsyncTask(mDao).execute(); }
+
+    public void update(Card card) { new updateAsyncTask(mDao).execute(card); }
+
+    public void clearFavorites() { new clearFavoritesAsyncTask(mDao).execute(); }
 
     private static class deleteAllAsyncTask extends CardAsyncTask<Void, Void, Void> {
         deleteAllAsyncTask(CardDao dao) { super(dao); }
@@ -28,10 +32,6 @@ public class CardRepository {
             getAsyncTaskDao().deleteAll();
             return null;
         }
-    }
-
-    public void update (Card card) {
-        new updateAsyncTask(mDao).execute(card);
     }
 
     private static class updateAsyncTask extends CardAsyncTask<Card, Void, Void> {
@@ -45,5 +45,14 @@ public class CardRepository {
         }
     }
 
+    private static class clearFavoritesAsyncTask extends CardAsyncTask<Void, Void, Void> {
+        clearFavoritesAsyncTask(CardDao dao) { super(dao); }
+
+        @Override
+        protected Void doInBackground(final Void... params) {
+            getAsyncTaskDao().clearFavorites();
+            return null;
+        }
+    }
 }
 

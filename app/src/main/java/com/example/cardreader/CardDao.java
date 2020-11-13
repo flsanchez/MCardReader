@@ -26,4 +26,7 @@ public interface CardDao {
 
     @Query("UPDATE card_table SET is_favourite=:isFavourite WHERE id=:id")
     void update(int id, Boolean isFavourite);
+
+    @Query("UPDATE card_table SET is_favourite=0")
+    void clearFavorites();
 }

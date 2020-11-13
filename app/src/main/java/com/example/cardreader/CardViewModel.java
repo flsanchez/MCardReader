@@ -22,4 +22,6 @@ public class CardViewModel extends AndroidViewModel {
     public void deleteAll() {mRepository.deleteAll();}
 
     public void update(Card card) {mRepository.update(card);}
+
+    public void clearFavorites() {mRepository.clearFavorites();}
 }
