@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 
 import com.example.cardreader.databinding.FragmentCardListBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,7 +28,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
 
     private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
     private CardListAdapter mCardListAdapter;
-    private CardList cardList = new CardList();
+    private ArrayList<Card> cardList = new ArrayList<>();
     private FragmentCardListBinding binding;
     private CardViewModel mCardViewModel;
 
@@ -105,7 +106,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     private void updateCardListObserve(Boolean showFavorite) {
         mCardViewModel.getCardList(showFavorite).observe(
                 this, (List<Card> cardListUpdated) -> {
-                    cardList = new CardList(cardListUpdated);
+                    cardList = new ArrayList<>(cardListUpdated);
                     mCardListAdapter.setCardList(cardList);
         });
     }

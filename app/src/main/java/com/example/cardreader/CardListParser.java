@@ -13,15 +13,10 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardList extends ArrayList<Card> {
+public class CardListParser {
 
-    public CardList () {
-        super();
-    }
-
-    public CardList (List<Card> cardList) { super(cardList); }
-
-    public void addItemsFromJSON(String TAG, InputStream inputStream) {
+    public static ArrayList<Card> addItemsFromJSON(String TAG, InputStream inputStream) {
+        ArrayList<Card> cardList = new ArrayList<>();
         try {
             String jsonString = readDataFromJSONFile(inputStream);
             JSONArray jsonDataArray = new JSONArray(jsonString);
@@ -35,15 +30,16 @@ public class CardList extends ArrayList<Card> {
                         jsonDataItem.getJSONObject("identifiers").getString("scryfallId");
 
                 Card card = new Card(name, text, scryfallId);
-                this.add(card);
+                cardList.add(card);
             }
 
         } catch (JSONException | IOException e) {
             Log.d(TAG, "addItemsFromJSON: ", e);
         }
+        return cardList;
     }
 
-    private String readDataFromJSONFile(InputStream inputStream) throws IOException {
+    private static String readDataFromJSONFile(InputStream inputStream) throws IOException {
         StringBuilder builder = new StringBuilder();
         try {
             String jsonString;

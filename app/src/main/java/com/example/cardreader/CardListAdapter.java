@@ -11,12 +11,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.cardreader.databinding.CardRecyclerItemBinding;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static
         androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY;
 
 public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardViewHolder> {
     private final LayoutInflater mInflater;
-    private CardList cardList;
+    private ArrayList<Card> cardList;
     public StateRestorationPolicy stateRestorationPolicy = PREVENT_WHEN_EMPTY;
     private Boolean showFavorite = false;
     private final CardImageDisplayer cardImageDisplayer;
@@ -31,7 +34,7 @@ public class CardListAdapter extends RecyclerView.Adapter<CardListAdapter.CardVi
         this.cardFavoriteManager = cardFavoriteManager;
     }
 
-    public void setCardList(CardList cardList) {
+    public void setCardList(ArrayList<Card> cardList) {
         this.cardList = cardList;
         notifyDataSetChanged();
     }

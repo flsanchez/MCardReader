@@ -11,6 +11,7 @@ import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 
 @Database(entities = {Card.class}, version = 2, exportSchema = false)
 public abstract class CardRoomDatabase extends RoomDatabase {
@@ -53,8 +54,8 @@ public abstract class CardRoomDatabase extends RoomDatabase {
         @Override
         protected Void doInBackground(final Void... params) {
             if (mDao.getAnyCard().length < 1) {
-                CardList cardList = new CardList();
-                cardList.addItemsFromJSON("DB", cardListStream);
+                ArrayList<Card> cardList =
+                        CardListParser.addItemsFromJSON("DB", cardListStream);
                 for (int i = 0; i < cardList.size() ; i++) {
                     mDao.insert(cardList.get(i));
                 }
