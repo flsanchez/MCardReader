@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
 public class CardListParser {
 
@@ -24,10 +23,10 @@ public class CardListParser {
             for (int i=0; i<jsonDataArray.length(); i++) {
                 JSONObject jsonDataItem = jsonDataArray.getJSONObject(i);
 
-                String name = jsonDataItem.getString("name");
-                String text = jsonDataItem.getString("text");
+                String name = jsonDataItem.optString("name");
+                String text = jsonDataItem.optString("text");
                 String scryfallId =
-                        jsonDataItem.getJSONObject("identifiers").getString("scryfallId");
+                        jsonDataItem.getJSONObject("identifiers").optString("scryfallId");
 
                 Card card = new Card(name, text, scryfallId);
                 cardList.add(card);
