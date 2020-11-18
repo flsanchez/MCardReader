@@ -47,10 +47,13 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
 
         mCardViewModel = ViewModelProviders.of(this).get(CardViewModel.class);
         mCardListAdapter = new CardListAdapter(
-                this.getContext(),this, this);
+                this.getContext(), this, this);
         mCardListAdapter.setShowFavorite(showFavorite);
         mCardListAdapter.setCardList(cardList);
 
+        if (shouldInitializeCardDetailFragment()) {
+            initializeCardDetailFragment();
+        }
         updateCardListObserve(showFavorite);
 
     }
@@ -58,7 +61,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding =  DataBindingUtil.inflate(
+        binding = DataBindingUtil.inflate(
                 inflater, R.layout.fragment_card_list, container, false);
         binding.recyclerView.setAdapter(mCardListAdapter);
         return binding.getRoot();
@@ -66,20 +69,32 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
 
     @Override
     public void displayCard(Card card) {
-        if (isScreenPortrait()) {
-            displayCardPortrait(card);
-        } else {
+        if (shouldDisplayCardLandscape()) {
             displayCardLandscape(card);
+        } else {
+            displayCardPortrait(card);
         }
     }
 
-    public Boolean isScreenPortrait() {
-        int screen_orientation = this.getResources().getConfiguration().orientation;
-        return screen_orientation == Configuration.ORIENTATION_PORTRAIT;
+    public void initializeCardDetailFragment() {
+        CardDetailFragment.createCardDetailFragment(getFragmentManager());
+    }
+
+    public Boolean shouldDisplayCardLandscape() {
+        return isScreenLandscape();
+    }
+
+    public Boolean shouldInitializeCardDetailFragment() {
+        return isScreenLandscape();
+    }
+
+    public Boolean isScreenLandscape() {
+        int screen_orientation = getResources().getConfiguration().orientation;
+        return screen_orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     private void displayCardPortrait(Card card) {
-        Context context = this.getActivity();
+        Context context = getActivity();
         Intent intent = new Intent(context, CardDetailActivity.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(CardDetailActivity.KEY_CARD, card);
@@ -88,7 +103,7 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
     }
 
     private void displayCardLandscape(Card card) {
-        CardDetailFragment.getOrCreateCardDetailFragment(getFragmentManager()).displayCard(card);
+        CardDetailFragment.getCardDetailFragment(getFragmentManager()).displayCard(card);
     }
 
     @Override

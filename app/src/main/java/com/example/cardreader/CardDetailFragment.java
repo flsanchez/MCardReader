@@ -25,19 +25,22 @@ public class CardDetailFragment extends Fragment implements CardImageDisplayer {
 
     public static CardDetailFragment newInstance() { return new CardDetailFragment(); }
 
-    public static CardDetailFragment
-    getOrCreateCardDetailFragment(FragmentManager fragmentManager) {
-        CardDetailFragment cardDetailFragment =
-                (CardDetailFragment) fragmentManager.
-                        findFragmentById(R.id.card_detail_fragment_container);
+    public static void
+    createCardDetailFragment(FragmentManager fragmentManager) {
+        CardDetailFragment cardDetailFragment = getCardDetailFragment(fragmentManager);
         if (cardDetailFragment == null) {
             cardDetailFragment = CardDetailFragment.newInstance();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(
+            fragmentTransaction.add(
                     R.id.card_detail_fragment_container, cardDetailFragment);
-            fragmentTransaction.commitNow();
+            fragmentTransaction.commit();
         }
-        return cardDetailFragment;
+    }
+
+    public static CardDetailFragment
+    getCardDetailFragment(FragmentManager fragmentManager) {
+        return (CardDetailFragment) fragmentManager.
+                        findFragmentById(R.id.card_detail_fragment_container);
     }
 
     @Override

@@ -13,7 +13,6 @@ import com.example.cardreader.databinding.ActivityMainBinding;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private Boolean showFavorite = true;
-    private CardListFragment cardListFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,26 +20,28 @@ public class MainActivity extends AppCompatActivity {
         ActivityMainBinding binding =
                 DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        cardListFragment = getOrCreateCardListFragment();
-        getSupportFragmentManager().
-                beginTransaction().
-                replace(R.id.fragment_recycler_container, cardListFragment).
-                commit();
+        initializeCardListFragment();
 
         binding.fabFavorites.setOnClickListener((view) -> {
             showFavorite = !showFavorite;
-            getOrCreateCardListFragment().toggleFavoriteList(showFavorite);
+            getCardListFragment().toggleFavoriteList(showFavorite);
         });
     }
 
-    private CardListFragment getOrCreateCardListFragment() {
-        CardListFragment cardListFragment =
-                (CardListFragment) getSupportFragmentManager().
-                        findFragmentById(R.id.fragment_recycler_container);
+    private void initializeCardListFragment() {
+        CardListFragment cardListFragment = getCardListFragment();
         if (cardListFragment == null) {
             cardListFragment = CardListFragment.newInstance(showFavorite);
+            getSupportFragmentManager().
+                    beginTransaction().
+                    add(R.id.fragment_recycler_container, cardListFragment).
+                    commit();
         }
-        return cardListFragment;
+    }
+
+    private CardListFragment getCardListFragment() {
+        return (CardListFragment) getSupportFragmentManager().
+                findFragmentById(R.id.fragment_recycler_container);
     }
 
     @Override
@@ -54,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.clear_favorites:
-                cardListFragment.clearFavorites();
+                getCardListFragment().clearFavorites();
                 return true;
             case R.id.delete_db:
-                cardListFragment.deleteDB();
+                getCardListFragment().deleteDB();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
