@@ -26,11 +26,12 @@ import java.util.List;
  */
 public class CardListFragment extends Fragment implements CardImageDisplayer, CardFavoriteManager {
 
-    private static final String FAVORITE_PARAM = "FAVORITE_PARAM";
+    public static final String FAVORITE_PARAM = "FAVORITE_PARAM";
     private CardListAdapter mCardListAdapter;
     private ArrayList<Card> cardList = new ArrayList<>();
     private FragmentCardListBinding binding;
-    private CardViewModel mCardViewModel;
+    public CardViewModel mCardViewModel;
+    private Boolean showFavorite;
 
     public static CardListFragment newInstance(Boolean showFavorite) {
         CardListFragment fragment = new CardListFragment();
@@ -40,12 +41,18 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         return fragment;
     }
 
+    private void initializeCardViewModel() {
+        if (mCardViewModel == null) {
+            mCardViewModel = ViewModelProviders.of(this).get(CardViewModel.class);
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Boolean showFavorite = getArguments().getBoolean(FAVORITE_PARAM);
+        showFavorite = getArguments().getBoolean(FAVORITE_PARAM);
 
-        mCardViewModel = ViewModelProviders.of(this).get(CardViewModel.class);
+        initializeCardViewModel();
         mCardListAdapter = new CardListAdapter(
                 this.getContext(), this, this);
         mCardListAdapter.setShowFavorite(showFavorite);
@@ -54,8 +61,12 @@ public class CardListFragment extends Fragment implements CardImageDisplayer, Ca
         if (shouldInitializeCardDetailFragment()) {
             initializeCardDetailFragment();
         }
-        updateCardListObserve(showFavorite);
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateCardListObserve(showFavorite);
     }
 
     @Override
